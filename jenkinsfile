@@ -1,0 +1,39 @@
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Clone Code') {
+            steps {
+                git 'https://github.com/Sharayu1707/stud-reg-flask-app.git'
+            }
+        }
+
+        stage('Setup Python Environment') {
+            steps {
+                sh '''
+                python3 -m venv venv
+                . venv/bin/activate
+                pip install -r requirements.txt
+                '''
+            }
+        }
+
+        stage('Run Flask App') {
+            steps {
+                sh '''
+                nohup python3 app.py &
+                '''
+            }
+        }
+
+        stage('Verify App Running') {
+            steps {
+                sh '''
+                sleep 5
+                curl http://localhost:5000 || true
+                '''
+            }
+        }
+    }
+}
