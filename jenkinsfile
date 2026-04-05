@@ -3,9 +3,9 @@ pipeline {
 
     stages {
 
-        stage('Clone Code') {
+        stage('Checkout Code') {
             steps {
-                git 'https://github.com/Sharayu1707/stud-reg-flask-app.git'
+                git branch: 'main', url: 'https://github.com/Sharayu1707/stud-reg-flask-app.git'
             }
         }
 
@@ -14,7 +14,16 @@ pipeline {
                 sh '''
                 python3 -m venv venv
                 . venv/bin/activate
+                pip install --upgrade pip
                 pip install -r requirements.txt
+                '''
+            }
+        }
+
+        stage('Stop Old App') {
+            steps {
+                sh '''
+                pkill -f app.py || true
                 '''
             }
         }
@@ -22,7 +31,7 @@ pipeline {
         stage('Run Flask App') {
             steps {
                 sh '''
-                nohup python3 app.py &
+                nohup python3 app.py > output.log 2>&1 &
                 '''
             }
         }
